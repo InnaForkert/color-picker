@@ -1,8 +1,8 @@
 <script setup>
 import { reactive, computed, ref } from "vue";
 
-//top-right-corner color
 const btnText = ref('Copy CSS');
+const colorPicker = ref(null);
 
 const color = reactive({
   fromRange: 0,
@@ -18,7 +18,7 @@ const finalColor = reactive({
 });
 
 const coords = reactive({
-  x: 117,
+  x: 0,
   y: 0,
 });
 
@@ -62,7 +62,11 @@ function dragPicker({ offsetX, offsetY, buttons }) {
   if (buttons === 1) {
     coords.x = offsetX;
     coords.y = offsetY;
-    computeFinalColor(offsetX, offsetY);
+    if (coords.x < 0) coords.x = 0;
+    if (coords.y < 0) coords.y = 0;
+    if (coords.x > colorPicker.value.clientWidth) coords.x = colorPicker.value.clientWidth;
+    if (coords.y > colorPicker.value.clientHeight) coords.y = colorPicker.value.clientHeight;
+    computeFinalColor((offsetX / colorPicker.value.clientWidth), (offsetY / colorPicker.value.clientHeight));
     computeGradient();
     computeHex();
   }
@@ -100,7 +104,7 @@ function computeColorFromRange() {
 }
 
 function copyGradient() {
-  navigator.clipboard.writeText(bcgColor.value) // Write the text to clipboard
+  navigator.clipboard.writeText(bcgColor.value)
     .then(() => {
       btnText.value = 'Copied!';
       setTimeout(() => btnText.value = 'Copy CSS', 2500);
@@ -136,9 +140,9 @@ function choseActiveColor(i) {
 
 function computeFinalColor(x, y) {
   const computedColorX = {
-    r: 255 - ((255 - color.r) * x) / 117,
-    g: 255 - ((255 - color.g) * x) / 117,
-    b: 255 - ((255 - color.b) * x) / 117,
+    r: color.r * x,
+    g: color.g * x,
+    b: color.b * x,
   };
 
   finalColor.r = Math.round(computedColorX.r - (computedColorX.r * y) / 90);
@@ -163,7 +167,7 @@ export default {
 <template>
   <div class="color-picker-container">
     <div class="color-picker-section">
-      <div class="color-picker" @pointermove="dragPicker"></div>
+      <div class="color-picker" @pointermove="dragPicker" ref="colorPicker"></div>
       <div class="inputs-preview">
         <div class="inputs">
           <input type="range" class="color-range" v-model="color.fromRange" min="0" max="120" step="1"
@@ -287,6 +291,7 @@ body {
 }
 
 .color-picker-container {
+  position: relative;
   width: 100%;
   height: 100vh;
   display: flex;
