@@ -2,6 +2,7 @@
   "name": "color-picker",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://innaforkert.github.io/color-picker/",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
