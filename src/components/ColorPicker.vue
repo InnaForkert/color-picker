@@ -111,9 +111,9 @@ function copyGradient() {
 }
 
 function computeHex() {
-  finalColor.hex = `#${finalColor.r.toString(16)}${finalColor.g.toString(
+  finalColor.hex = `#${finalColor.r.toString(16).padStart(2, '0')}${finalColor.g.toString(
     16
-  )}${finalColor.b.toString(16)}`;
+  ).padStart(2, '0')}${finalColor.b.toString(16).padStart(2, '0')}`;
 }
 
 function handleHexBlur() {
