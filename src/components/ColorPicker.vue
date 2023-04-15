@@ -22,8 +22,8 @@ const coords = reactive({
   y: 0,
 });
 
-const x = computed(() => `${coords.x - 12.5}px`);
-const y = computed(() => `${coords.y - 12.5}px`);
+const x = computed(() => `${(coords.x * colorPicker.value.clientWidth) - 12.5}px`);
+const y = computed(() => `${(coords.y * colorPicker.value.clientHeight) - 12.5}px`);
 
 const bcgColor = computed(() => `linear-gradient(${gradient.angle}deg, ${gradient.firstColor} ${gradient.stop}%, ${gradient.secondColor}, ${gradient.thirdColor})`)
 
@@ -54,19 +54,20 @@ const angle = computed(() => `${gradient.angle}deg`);
 const firstColor = computed(() => gradient.firstColor);
 const secondColor = computed(() => gradient.secondColor);
 const thirdColor = computed(() => gradient.thirdColor);
-const stop = computed(() => `${gradient.stop}%`);
+const computedStop = computed(() => `${gradient.stop * 0.85}%`);
+const isSecondColor = computed(() => gradient.activeColor === 'secondColor' ? "white" : 'transparent')
 
 let computedFinalColor = chosenColor;
 
 function dragPicker({ offsetX, offsetY, buttons }) {
   if (buttons === 1) {
-    coords.x = offsetX;
-    coords.y = offsetY;
+    coords.x = offsetX / colorPicker.value.clientWidth;
+    coords.y = offsetY / colorPicker.value.clientHeight;
     if (coords.x < 0) coords.x = 0;
     if (coords.y < 0) coords.y = 0;
     if (coords.x > colorPicker.value.clientWidth) coords.x = colorPicker.value.clientWidth;
     if (coords.y > colorPicker.value.clientHeight) coords.y = colorPicker.value.clientHeight;
-    computeFinalColor((offsetX / colorPicker.value.clientWidth), (offsetY / colorPicker.value.clientHeight));
+    computeFinalColor(coords.x, coords.y);
     computeGradient();
     computeHex();
   }
@@ -98,7 +99,6 @@ function computeColorFromRange() {
     color.g = 0;
     color.b = Math.round(255 - (120 - color.fromRange) * 12.75);
   }
-  computeHex();
   computeGradient();
   computeFinalColor(coords.x, coords.y);
 }
@@ -114,10 +114,11 @@ function copyGradient() {
     });
 }
 
-function computeHex() {
-  finalColor.hex = `#${finalColor.r.toString(16).padStart(2, '0')}${finalColor.g.toString(
+function computeHex(color) {
+  if (!color) color = finalColor;
+  finalColor.hex = `#${color.r.toString(16).padStart(2, '0')}${color.g.toString(
     16
-  ).padStart(2, '0')}${finalColor.b.toString(16).padStart(2, '0')}`;
+  ).padStart(2, '0')}${color.b.toString(16).padStart(2, '0')}`;
 }
 
 function handleHexBlur() {
@@ -135,7 +136,6 @@ function computeGradient() {
 
 function choseActiveColor(i) {
   gradient.activeColor = i;
-  computeGradient();
 }
 
 function computeFinalColor(x, y) {
@@ -153,7 +153,6 @@ function computeFinalColor(x, y) {
     () =>
       `rgba(${finalColor.r}, ${finalColor.g}, ${finalColor.b}, ${finalColor.a})`
   );
-
   computeHex();
 }
 </script>
@@ -193,10 +192,12 @@ export default {
     <div class="color-picker-section">
       <div class="gradient-preview"></div>
       <label class="gradient-range-label">
-        <div class="before" @click="choseActiveColor('firstColor')"></div>
+        <div class="before" :class="{ 'active-color': gradient.activeColor === 'firstColor' }"
+          @click="choseActiveColor('firstColor')"></div>
         <input type="range" class="gradient-range" @input="choseActiveColor('secondColor')" v-model="gradient.stop"
-          min="0" max="100" step="1" />
-        <div class="after" @click="choseActiveColor('thirdColor')"></div>
+          min="0" max="100" step="1" :class="{ 'active-color': gradient.activeColor === 'secondColor' }" />
+        <div class="after" @click="choseActiveColor('thirdColor')"
+          :class="{ 'active-color': gradient.activeColor === 'thirdColor' }"></div>
       </label>
       <div class="angle-inputs">
         <label>Angle<input type="range" class="angle-range" v-model="gradient.angle" @input="computeGradient" min="0"
@@ -574,11 +575,15 @@ input[type="number"] {
   cursor: pointer;
 }
 
+.active-color {
+  background-color: white;
+}
+
 input.gradient-range {
   border-radius: 4px;
   border: 1px solid white;
   background: linear-gradient(90deg,
-      v-bind(firstColor) v-bind(stop),
+      v-bind(firstColor) v-bind(computedStop),
       v-bind(secondColor),
       v-bind(thirdColor));
 }
@@ -600,10 +605,8 @@ input.gradient-range::-webkit-slider-thumb {
   outline: 1px solid rgba(0, 0, 0, 0.184);
   border-radius: 50%;
 
-  background: v-bind(firstColor);
-
+  background-color: v-bind(isSecondColor);
   cursor: pointer;
-
 }
 
 .angle-inputs {
