@@ -191,22 +191,31 @@ export default {
   </div>
 </template>
 
-<style lang="css" scoped>
+<style lang="css">
+body {
+  overflow: hidden;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 .color-picker-container {
-  position: relative;
-
-  width: 100vw;
+  width: 100%;
   height: 100vh;
-
-  display: grid;
-  gap: 15px;
-  place-items: center;
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
   background: v-bind(bcgColor);
+
 }
 
 .color-picker-section {
-  width: 30vw;
+  width: 40vw;
   height: 30vh;
 }
 
@@ -214,13 +223,15 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.747);
+
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   border: 1px solid #00000042;
   height: 100%;
-  width: 5px;
+  width: 15px;
   border-radius: 3px;
   background: #ffffff;
   cursor: pointer;
@@ -234,14 +245,14 @@ input[type="range"]::-ms-track {
   background: transparent;
   border-color: transparent;
   color: transparent;
+  height: 100%;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
   cursor: pointer;
   width: 100%;
   appearance: none;
-  border-radius: 2px;
-  height: 8px;
+  height: 20px;
 }
 
 input::-webkit-outer-spin-button,
@@ -318,7 +329,15 @@ input[type="number"] {
 .inputs {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap:
+    4px;
+  width: 100%;
+}
+
+.color-range {
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid white;
 }
 
 .color-range::-webkit-slider-runnable-track {
@@ -347,6 +366,9 @@ input[type="number"] {
 
   overflow: hidden;
 
+  border: 1px solid white;
+  border-radius: 4px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.747);
 }
 
 .opacity-range::after {
@@ -365,10 +387,12 @@ input[type="number"] {
 }
 
 .color-preview {
-  width: 38px;
-  height: 38px;
+  width: 50px;
+  height: 50px;
 
-  border-radius: 2px;
+  border-radius: 4px;
+  border: 1px solid white;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.747);
 
   background-color: v-bind(computedFinalColor);
 }
@@ -391,14 +415,14 @@ input[type="number"] {
 
 .color-values label input {
   width: 100%;
-  height: 12px;
+  height: 24px;
   padding: 5px;
   outline: none;
   border-radius: 10px;
   outline: none;
   border: none;
   box-shadow: inset 1px 1px 1px black;
-  margin-top: 10px;
+  margin-top: 4px;
   font-size: 18px;
   font-family: Monospace;
   text-align: center;
@@ -406,8 +430,11 @@ input[type="number"] {
 
 .gradient-preview {
   width: 100%;
-  height: 120px;
+  height: 100%;
   margin-bottom: 4px;
+  border: 2px solid white;
+  border-radius: 10px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.747);
 
   background: linear-gradient(v-bind(angle),
       v-bind(firstColor) v-bind(stop),
@@ -422,15 +449,15 @@ input[type="number"] {
 .before {
   content: "";
   position: absolute;
-  bottom: 5px;
-  left: 0;
+  bottom: 0px;
+  left: -2px;
 
   display: block;
 
-  width: 4px;
-  height: 4px;
+  width: 15px;
+  height: 15px;
 
-  border: 1px solid white;
+  border: 2px solid white;
   outline: 1px solid rgba(0, 0, 0, 0.152);
   border-radius: 50%;
 
@@ -442,15 +469,15 @@ input[type="number"] {
 .after {
   content: "";
   position: absolute;
-  bottom: 5px;
-  right: 0;
+  bottom: 0px;
+  right: -2px;
 
   display: block;
 
-  width: 4px;
-  height: 4px;
+  width: 15px;
+  height: 15px;
 
-  border: 1px solid white;
+  border: 2px solid white;
   outline: 1px solid rgba(0, 0, 0, 0.152);
   border-radius: 50%;
 
@@ -461,6 +488,7 @@ input[type="number"] {
 
 input.gradient-range {
   border-radius: 4px;
+  border: 1px solid white;
   background: linear-gradient(90deg,
       v-bind(firstColor) v-bind(stop),
       v-bind(secondColor),
@@ -469,16 +497,16 @@ input.gradient-range {
 
 input.gradient-range::-webkit-slider-runnable-track {
   border-radius: 2px;
-  height: 18px;
+  height: 100%;
 }
 
 input.gradient-range::-webkit-slider-thumb {
   position: relative;
   z-index: 1;
 
-  height: 8px;
-  width: 8px;
-  margin-top: 14px;
+  height: 15px;
+  width: 15px;
+  margin-top: 5px;
 
   border: 2px solid white;
   outline: 1px solid rgba(0, 0, 0, 0.184);
@@ -494,33 +522,51 @@ input.gradient-range::-webkit-slider-thumb {
   display: grid;
   grid-template-columns: 80% 20%;
   gap: 5px;
+  align-items: center;
 
-  width: 95%;
+  width: 100%;
 
   text-align: center;
 
   outline: none;
 
-  font-size: 8px;
+  font-size: 18px;
+  font-family: Monospace;
+  text-align: center;
 }
 
 .angle-inputs label {
   display: flex;
   flex-direction: column-reverse;
+  gap: 2px;
+  align-items: center;
 }
 
-.angle-inputs label input {
-  height: 12px;
-
+.angle-inputs label input[type='number'] {
+  width: 100%;
+  height: 24px;
+  padding: 5px;
   outline: none;
-
-  font-size: 6px;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  box-shadow: inset 1px 1px 1px black;
+  font-size: 18px;
+  font-family: Monospace;
   text-align: center;
 }
 
+.angle-range {
+  height: 100%;
+  width: 100%;
+  border: 1px solid white;
+  border-radius: 4px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.747);
+}
 
 .angle-range::-webkit-slider-runnable-track {
   border: 1px solid rgba(128, 128, 128, 0.438);
   background-color: #f1f1f1;
+  height: 100%;
 }
 </style>
